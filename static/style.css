@@ -1,0 +1,156 @@
+/* Flat Panels: clean solid dark containers without frosted glass blur */
+.glass-panel {
+  background-color: #122131;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+/* Lighter flat treatment for structural chrome (header/sidebar) */
+.liquid-surface {
+  background-color: #0d1c2d;
+}
+
+.glass-panel, .liquid-surface { position: relative; overflow: hidden; }
+
+@keyframes pulse-cyan {
+  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 10px rgba(93, 230, 255, 0.5); }
+  50% { opacity: 0.6; transform: scale(1.05); box-shadow: 0 0 20px rgba(93, 230, 255, 0.8); }
+}
+@keyframes pulse-indigo {
+  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 10px rgba(192, 193, 255, 0.5); }
+  50% { opacity: 0.6; transform: scale(1.05); box-shadow: 0 0 20px rgba(192, 193, 255, 0.8); }
+}
+
+.agent-pulse-listening { background-color: #5de6ff; animation: pulse-cyan 2.2s infinite ease-in-out; }
+.agent-pulse-processing { background-color: #c0c1ff; animation: pulse-indigo 0.9s infinite ease-in-out; }
+.agent-pulse-done { background-color: #5de6ff; }
+
+.code-input {
+  background-color: rgba(5, 20, 36, 0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.3s ease;
+}
+.code-input:focus-within {
+  border-color: #6366F1;
+  box-shadow: inset 0 0 10px rgba(99, 102, 241, 0.2);
+}
+
+.blueprint-bg {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: rgba(5, 20, 36, 0.5); }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+
+/* Chat message entrance */
+.chat-line { animation: fadeIn 0.25s ease; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Day coverage chips (right panel) */
+.day-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(93, 230, 255, 0.08);
+  border: 1px solid rgba(93, 230, 255, 0.3);
+  color: #5de6ff;
+}
+
+/* Agent directive cards in the debrief */
+.directive-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.015));
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  border-radius: 0.5rem;
+  padding: 14px 16px;
+  animation: liquid-sway 12s ease-in-out infinite alternate;
+}
+
+/* Liquid floating effect for all page panels and cards */
+.glass-panel {
+  animation: liquid-float 8s ease-in-out infinite alternate;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-panel:nth-child(even) {
+  animation-delay: -3s;
+}
+
+.glass-panel:nth-child(3n) {
+  animation-delay: -5s;
+}
+
+@keyframes liquid-float {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  }
+  50% {
+    transform: translateY(-6px) rotate(0.3deg);
+    box-shadow: 0 16px 35px rgba(0, 247, 255, 0.05), 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+  100% {
+    transform: translateY(0px) rotate(0deg);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  }
+}
+
+@keyframes liquid-sway {
+  0% { border-radius: 8px 14px 8px 12px; }
+  100% { border-radius: 14px 8px 12px 8px; }
+}
+
+/* Shifting liquid gradient effect on progress bars */
+.w-full.bg-surface-variant > div {
+  position: relative;
+  overflow: hidden;
+  background-image: linear-gradient(
+    90deg, 
+    rgba(255, 255, 255, 0) 0%, 
+    rgba(255, 255, 255, 0.3) 50%, 
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: liquid-shine 3s infinite linear;
+}
+
+@keyframes liquid-shine {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Flowing liquid gradient backgrounds for primary action buttons */
+.bg-inverse-primary {
+  background-image: linear-gradient(270deg, #494bd6, #00cbe6, #494bd6) !important;
+  background-size: 300% 100% !important;
+  animation: liquid-gradient-flow 6s ease infinite !important;
+  transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+.bg-inverse-primary:not(:disabled):hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 0 15px rgba(0, 203, 230, 0.4);
+}
+
+@keyframes liquid-gradient-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agent-pulse-listening, .agent-pulse-processing, .chat-line, .glass-panel, .directive-card, .w-full.bg-surface-variant > div, .bg-inverse-primary { animation: none; }
+}
