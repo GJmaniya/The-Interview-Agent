@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Candidate Dashboard — The Interview Agent{% endblock %}
+{% block body_overflow %}{% endblock %}
+
+{% block content %}
+<main class="flex-1 overflow-y-auto blueprint-bg relative custom-scrollbar">
+  <div class="absolute top-[-5%] right-[-5%] w-[35%] h-[35%] bg-secondary/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+  <div class="max-w-6xl mx-auto px-6 md:px-margin-desktop py-12 relative z-10">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+      <div>
+        <div class="mb-2 font-technical-label text-[10px] text-secondary uppercase tracking-widest flex items-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> Live Sync: Optimal
+        </div>
+        <h1 class="font-headline-lg text-headline-lg text-on-surface mb-2">Cohort Progress</h1>
+        <p class="text-on-surface-variant text-sm max-w-xl">Tracking {{ total_candidates }} candidates across the 31-day AI Cohort. Select anyone below to launch a personalized interview grounded in their actual mission log.</p>
+      </div>
+      <div class="glass-panel rounded-xl p-5 flex items-center gap-4 shrink-0">
+        <div class="relative w-16 h-16 shrink-0">
+          <svg viewBox="0 0 36 36" class="w-16 h-16 -rotate-90">
+            <circle cx="18" cy="18" r="16" fill="none" stroke="#273647" stroke-width="3"></circle>
+            <circle cx="18" cy="18" r="16" fill="none" stroke="#5de6ff" stroke-width="3"
+              stroke-dasharray="{{ (avg_readiness / 100 * 100.53) | round(1) }} 100.53" stroke-linecap="round"></circle>
+          </svg>
+          <div class="absolute inset-0 flex items-center justify-center font-technical-label text-sm text-on-surface">{{ avg_readiness }}</div>
+        </div>
+        <div>
+          <div class="font-technical-label text-[10px] text-on-surface-variant uppercase tracking-wider">Avg. Readiness</div>
+          <div class="text-on-surface text-sm font-medium">Across cohort</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      {% for c in candidates %}
+      <div class="glass-panel rounded-xl p-5 flex flex-col {{ 'border-t border-t-primary/40' if c.readiness >= 80 else ('border-t border-t-[#ffb4ab]/40' if c.readiness < 50 else '') }}">
+        <div class="flex items-start justify-between mb-3">
+          <div>
+            <div class="font-technical-label text-[10px] text-primary">{{ c.id }}</div>
+            <h3 class="text-on-surface font-medium leading-snug mt-0.5">{{ c.name }}</h3>
+            <div class="text-on-surface-variant text-xs mt-0.5">{{ c.jobRole }}</div>
+          </div>
+          <span class="font-technical-label text-[9px] uppercase tracking-wider text-secondary border border-secondary/30 rounded-full px-2 py-0.5 shrink-0">{{ c.status }}</span>
+        </div>
+
+        <div class="mb-3">
+          <div class="flex justify-between text-[10px] font-technical-label text-on-surface-variant mb-1">
+            <span>READINESS</span>
+            <span class="{{ 'text-secondary' if c.readiness >= 80 else ('text-[#ffb4ab]' if c.readiness < 50 else 'text-primary') }}">{{ c.readiness }}%</span>
+          </div>
+          <div class="w-full bg-surface-variant rounded-full h-1.5 overflow-hidden">
+            <div class="h-1.5 rounded-full {{ 'bg-secondary' if c.readiness >= 80 else ('bg-[#ffb4ab]' if c.readiness < 50 else 'bg-primary') }}" style="width: {{ c.readiness }}%"></div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 mb-4 text-xs">
+          <div class="bg-surface-variant/30 rounded-lg px-2.5 py-2">
+            <div class="text-on-surface-variant font-technical-label text-[9px] uppercase">Missions</div>
+            <div class="text-on-surface font-medium">{{ c.missionsCompleted }}/{{ c.totalDays }}</div>
+          </div>
+          <div class="bg-surface-variant/30 rounded-lg px-2.5 py-2">
+            <div class="text-on-surface-variant font-technical-label text-[9px] uppercase">First-try</div>
+            <div class="text-on-surface font-medium">{{ c.missionsFirstTry }}</div>
+          </div>
+        </div>
+
+        {% if c.struggled or c.failed or c.skipped %}
+        <div class="flex flex-wrap gap-1.5 mb-4">
+          {% if c.failed %}<span class="font-technical-label text-[9px] text-[#ffb4ab] border border-[#ffb4ab]/30 rounded-full px-2 py-0.5">{{ c.failed }} FAILED</span>{% endif %}
+          {% if c.struggled %}<span class="font-technical-label text-[9px] text-primary border border-primary/30 rounded-full px-2 py-0.5">{{ c.struggled }} STRUGGLED</span>{% endif %}
+          {% if c.skipped %}<span class="font-technical-label text-[9px] text-on-surface-variant border border-outline-variant rounded-full px-2 py-0.5">{{ c.skipped }} SKIPPED</span>{% endif %}
+        </div>
+        {% endif %}
+
+        <a href="/?candidate={{ c.id }}"
+           class="mt-auto flex items-center justify-center gap-2 bg-inverse-primary hover:bg-primary-container text-white rounded-lg px-4 py-2 font-technical-label text-[11px] uppercase tracking-wider font-bold transition-colors">
+          Start Interview
+          <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</main>
+{% endblock %}

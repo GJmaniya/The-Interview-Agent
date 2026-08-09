@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block title %}Live Interview — The Interview Agent{% endblock %}
+
+{% block content %}
+  <!-- SideNavBar: agent branding + candidate control -->
+  <nav class="liquid-surface border-r border-white/10 hidden lg:flex flex-col h-full w-72 py-gutter px-4 shrink-0 overflow-y-auto custom-scrollbar">
+    <div class="mb-6 border-b border-outline-variant pb-6 flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center border border-outline-variant shrink-0">
+        <span class="material-symbols-outlined text-primary" style="font-size:20px">smart_toy</span>
+      </div>
+      <div>
+        <div class="text-on-surface font-technical-label text-technical-label font-bold uppercase tracking-wider">The Expert Observer</div>
+        <div class="text-on-surface-variant font-technical-label text-[10px] mt-1">AI Interviewer v2.1</div>
+      </div>
+    </div>
+
+    <div class="mb-2 font-technical-label text-[10px] text-on-surface-variant uppercase tracking-wider">01 · Select Candidate</div>
+    <p class="text-on-surface-variant text-xs mb-3 leading-relaxed">Choose who this session evaluates. Their mission log decides what gets asked.</p>
+
+    <select id="candidateSelect" disabled class="w-full bg-surface-variant border border-outline-variant rounded-lg px-3 py-2.5 text-on-surface text-sm mb-3 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-primary/50">
+      <option value="">Loading roster…</option>
+    </select>
+
+    <div id="dossierCard" hidden class="glass-panel rounded-lg p-3.5 mb-4 border-l-2 border-l-primary">
+      <div class="flex justify-between py-1 text-xs"><span class="text-on-surface-variant">Callsign</span><span id="dCallsign" class="font-technical-label text-on-surface">—</span></div>
+      <div class="flex justify-between py-1 text-xs"><span class="text-on-surface-variant">Name</span><span id="dName" class="text-on-surface text-right">—</span></div>
+      <div class="flex justify-between py-1 text-xs"><span class="text-on-surface-variant">Target role</span><span id="dRole" class="text-on-surface text-right">—</span></div>
+    </div>
+
+    <button id="beginBtn" disabled class="w-full bg-inverse-primary hover:bg-primary-container disabled:bg-surface-variant disabled:text-on-surface-variant disabled:cursor-not-allowed text-white rounded-lg px-4 py-2.5 font-technical-label text-technical-label uppercase tracking-wider font-bold transition-colors shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+      Begin Interview
+    </button>
+    <button id="resetBtn" hidden class="w-full mt-2 border border-outline-variant hover:border-secondary hover:text-secondary text-on-surface rounded-lg px-4 py-2.5 font-technical-label text-technical-label uppercase tracking-wider transition-colors">
+      Start a New Session
+    </button>
+
+    <div id="errorBanner" hidden class="mt-4 border border-error/40 bg-error-container/10 text-error text-xs rounded-lg px-3 py-2.5"></div>
+
+    <div class="mt-auto pt-6 border-t border-outline-variant flex flex-col gap-2">
+      <a href="/curriculum" class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-all duration-200">
+        <span class="material-symbols-outlined text-xl" style="font-size:20px">terminal</span>
+        <span class="font-technical-label text-technical-label">Technical Docs</span>
+      </a>
+      <a href="/dashboard" class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-all duration-200">
+        <span class="material-symbols-outlined text-xl" style="font-size:20px">dashboard</span>
+        <span class="font-technical-label text-technical-label">Candidate Dashboard</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Main Content: Split Screen -->
+  <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative blueprint-bg">
+    <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+    <!-- Left: Chat Interface -->
+    <section class="flex-1 flex flex-col min-w-0 border-r border-outline-variant/50 relative z-10">
+      <div class="px-6 py-4 border-b border-white/10 flex justify-between items-center liquid-surface">
+        <div class="flex items-center gap-3">
+          <div class="relative">
+            <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">record_voice_over</span>
+            <div id="pulseDot" class="absolute -bottom-1 -right-1 w-2 h-2 rounded-full bg-outline-variant"></div>
+          </div>
+          <h2 class="font-technical-label text-technical-label text-on-surface uppercase tracking-widest">Active Session</h2>
+        </div>
+        <div id="statusBadge" class="font-technical-label text-[10px] text-on-surface-variant border border-outline-variant px-2 py-1 rounded bg-surface-variant/30 flex items-center gap-2">
+          <span id="statusDot" class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
+          <span id="statusLabel">STANDBY</span>
+        </div>
+      </div>
+
+      <div id="log" class="flex-1 overflow-y-auto p-6 flex flex-col gap-6 custom-scrollbar">
+        <p id="logEmpty" class="text-on-surface-variant text-sm">Select a candidate on the left and begin the interview to open a channel.</p>
+      </div>
+
+      <form id="replyForm" class="p-6 border-t border-white/10 liquid-surface">
+        <div class="flex gap-3">
+          <div class="flex-1 code-input rounded-lg flex items-center px-4 py-2">
+            <input id="replyInput" disabled type="text" placeholder="Awaiting session start…"
+              class="bg-transparent border-none w-full text-on-surface font-body-sm focus:ring-0 placeholder:text-on-surface-variant/50" autocomplete="off">
+          </div>
+          <button id="sendBtn" type="submit" disabled
+            class="bg-inverse-primary hover:bg-primary-container disabled:bg-surface-variant disabled:text-on-surface-variant disabled:cursor-not-allowed text-white rounded-lg px-6 py-2 font-technical-label text-technical-label uppercase tracking-wider font-bold transition-colors shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+            Submit
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Right: Telemetry / Evaluation panel -->
+    <section class="flex-1 flex flex-col min-w-0 bg-surface-container-lowest/70 relative z-10 hidden md:flex">
+      <div id="rightHeader" class="px-6 py-4 border-b border-white/10 flex justify-between items-center liquid-surface">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-primary" style="font-size:20px">schema</span>
+          <h2 id="rightTitle" class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight">Session Telemetry</h2>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-5 custom-scrollbar">
+
+        <!-- Live progress (shown while interview is running) -->
+        <div id="progressPanel" class="glass-panel rounded-xl p-5 border-t border-t-primary/30">
+          <div class="flex justify-between items-end mb-3">
+            <h3 class="font-technical-label text-technical-label text-on-surface-variant uppercase tracking-wider">Coverage Progress</h3>
+            <span id="progressCount" class="font-technical-label text-[10px] text-primary">0 / 8 QUESTIONS</span>
+          </div>
+          <div class="w-full bg-surface-variant rounded-full h-1.5 mb-4 overflow-hidden">
+            <div id="progressBar" class="bg-primary h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+          <div class="flex justify-between items-end mb-2">
+            <span class="font-technical-label text-[10px] text-on-surface-variant uppercase tracking-wider">Distinct curriculum days</span>
+            <span id="daysCount" class="font-technical-label text-[10px] text-secondary">0 / 4</span>
+          </div>
+          <div id="dayChips" class="flex flex-wrap gap-1.5"></div>
+        </div>
+
+        <!-- Candidate brief -->
+        <div id="briefPanel" class="glass-panel rounded-xl p-5 border-l-2 border-l-outline-variant">
+          <h3 class="font-technical-label text-technical-label text-on-surface-variant uppercase tracking-wider mb-2 flex items-center gap-2">
+            <span class="material-symbols-outlined" style="font-size:16px">badge</span> Candidate Brief
+          </h3>
+          <p id="briefText" class="font-body-sm text-on-surface-variant opacity-80 text-sm">No candidate selected yet.</p>
+        </div>
+
+        <!-- Debrief report (hidden until done:true) -->
+        <div id="debrief" hidden class="flex flex-col gap-5">
+          <div class="glass-panel rounded-xl p-5 border-t border-t-secondary/30">
+            <h3 class="font-headline-lg-mobile text-lg text-on-surface mb-3">Performance Summary</h3>
+            <p id="fSummary" class="text-on-surface-variant text-sm leading-relaxed mb-4"></p>
+
+            <div class="mb-4">
+              <div class="flex items-center gap-2 text-secondary text-sm font-bold mb-1.5">
+                <span class="material-symbols-outlined" style="font-size:18px">check_circle</span> Strengths
+              </div>
+              <ul id="fStrengths" class="list-disc list-inside text-on-surface-variant text-sm space-y-1 pl-1"></ul>
+            </div>
+
+            <div>
+              <div class="flex items-center gap-2 text-[#ffb4ab] text-sm font-bold mb-1.5">
+                <span class="material-symbols-outlined" style="font-size:18px">warning</span> Gaps
+              </div>
+              <ul id="fGaps" class="list-disc list-inside text-on-surface-variant text-sm space-y-1 pl-1"></ul>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="font-technical-label text-technical-label text-on-surface-variant uppercase tracking-wider mb-3">Agent Directives</h3>
+            <div id="fNext" class="flex flex-col gap-3"></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+{% endblock %}
+
+{% block scripts %}
+<script>window.__PRESELECT_CANDIDATE__ = {{ (request.args.get('candidate') | tojson) if request.args.get('candidate') else 'null' }};</script>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+{% endblock %}
