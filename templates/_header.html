@@ -1,0 +1,15 @@
+<header class="liquid-surface border-b border-white/10 flex justify-between items-center w-full px-4 md:px-margin-desktop h-16 sticky top-0 z-50 shrink-0 shadow-[0_0_15px_rgba(99,102,241,0.05)]">
+  <div class="flex items-center gap-8">
+    <a href="/" class="font-technical-label text-technical-label font-bold text-primary tracking-tighter uppercase">The Interview Agent</a>
+    <nav class="hidden md:flex items-center gap-6 text-sm">
+      <a href="/curriculum" class="{{ 'text-secondary font-bold border-b-2 border-secondary pb-1' if active_page == 'curriculum' else 'text-on-surface-variant hover:text-secondary transition-colors' }}">Curriculum</a>
+      <a href="/dashboard" class="{{ 'text-secondary font-bold border-b-2 border-secondary pb-1' if active_page == 'dashboard' else 'text-on-surface-variant hover:text-secondary transition-colors' }}">Candidate Dashboard</a>
+      <a href="/" class="{{ 'text-secondary font-bold border-b-2 border-secondary pb-1' if active_page == 'interview' else 'text-on-surface-variant hover:text-secondary transition-colors' }}">Live Interview</a>
+    </nav>
+  </div>
+  <div class="flex items-center gap-4">
+    <button class="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center p-2 rounded-full hover:bg-surface-variant">
+      <span class="material-symbols-outlined">account_circle</span>
+    </button>
+  </div>
+</header>
